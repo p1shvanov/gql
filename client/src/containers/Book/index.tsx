@@ -4,7 +4,7 @@ import {Paper, Button, Box, Typography, TextField} from '@mui/material';
 import { Link } from 'react-router-dom';
 import { isNil } from 'lodash';
 
-import { BookCardComponent } from '../../components';
+import { BookCardComponent, NewComment } from '../../components';
 import {GET_BOOK_BY_ID, ADD_COMMENT_TO_BOOK} from './graphql';
 import {getBook, getBook_getBook_comments} from './__generated__/getBook';
 
@@ -18,7 +18,7 @@ const BookComponent: FC<BookComponentProps> = ({ bookId }) => {
   const [newCommentText, setNewCommentText] = useState(''); // State for new comment text
   const [newCommentAuthor, setNewCommentAuthor] = useState(''); // State for new comment author
 
-  const { data, error } = useQuery<getBook>(GET_BOOK_BY_ID, {
+  const { data, error, refetch } = useQuery<getBook>(GET_BOOK_BY_ID, {
     variables: { id: bookId },
   });
 
@@ -117,17 +117,17 @@ const BookComponent: FC<BookComponentProps> = ({ bookId }) => {
           />
           <Typography>Количество комментариев: {totalComments}</Typography>
           {currentComments.length > 0 ? (
-              <Paper sx={{ p: 2, mt: 2 }}>
+            <Paper sx={{ p: 2, mt: 2 }}>
                 <Typography variant="h6">Комментарии</Typography>
                 <Box sx={{ mt: 1 }}>
                   {currentComments.map(
-                      (comment, index) =>
-                          comment && (
-                              <Typography key={index}>
+                    (comment, index) =>
+                      comment && (
+                        <Typography key={index}>
                                 <strong>{comment.author}</strong>: {comment.text}
                               </Typography>
                           )
-                  )}
+                        )}
                 </Box>
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 2 }}>
                   <Button onClick={setPreviousPage} variant="outlined" disabled={pageNumber === 0}>
@@ -143,9 +143,9 @@ const BookComponent: FC<BookComponentProps> = ({ bookId }) => {
                 </Box>
               </Paper>
           ) : (
-              <Typography>Нет доступных комментариев.</Typography>
+            <Typography>Нет доступных комментариев.</Typography>
           )}
-          {/* Add Comment Section */}
+          <NewComment bookId={bookId} onNewComment={refetch} />
           <Box sx={{ mt: 2 }}>
             <TextField
                 label="Автор"
